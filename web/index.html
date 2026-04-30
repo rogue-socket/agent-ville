@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent-Ville</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>agent-ville</h1>
+    <div id="stats">
+      <span>Gen <strong id="gen">0</strong></span>
+      <span>Pop <strong id="pop">0</strong></span>
+      <span>Fitness <strong id="fit">0</strong></span>
+      <span>Deaths <strong id="deaths">0</strong></span>
+      <span id="status-indicator" class="paused">paused</span>
+    </div>
+    <div id="controls">
+      <button id="btn-toggle" title="Play/Pause (space)">play</button>
+      <button id="btn-step" title="Step one generation">step</button>
+      <label>speed <input id="speed" type="range" min="1" max="10" value="1"></label>
+    </div>
+  </header>
+
+  <main>
+    <canvas id="village"></canvas>
+    <aside id="inspector">
+      <div id="inspector-empty">click an agent to inspect</div>
+      <div id="inspector-content" class="hidden">
+        <h2 id="agent-name"></h2>
+        <div id="agent-meta"></div>
+        <h3>personality</h3>
+        <div id="agent-personality"></div>
+        <h3>genome</h3>
+        <div id="agent-genome"></div>
+        <h3>fitness history</h3>
+        <canvas id="fitness-chart" width="220" height="80"></canvas>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <div id="event-log"></div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
