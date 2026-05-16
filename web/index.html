@@ -14,22 +14,28 @@
       <span>Pop <strong id="pop">0</strong></span>
       <span>Fitness <strong id="fit">0</strong></span>
       <span>Deaths <strong id="deaths">0</strong></span>
+      <span>Mean death age <strong id="mean-death-age">—</strong></span>
       <span id="status-indicator" class="paused">paused</span>
     </div>
     <div id="controls">
       <button id="btn-toggle" title="Play/Pause (space)">play</button>
       <button id="btn-step" title="Step one generation">step</button>
+      <button id="btn-fit" title="Reset view (f)">fit</button>
       <label>speed <input id="speed" type="range" min="1" max="10" value="1"></label>
     </div>
   </header>
 
   <main>
-    <canvas id="village"></canvas>
+    <div id="canvas-wrap">
+      <canvas id="village"></canvas>
+    </div>
     <aside id="inspector">
       <div id="inspector-empty">click an agent to inspect</div>
       <div id="inspector-content" class="hidden">
         <h2 id="agent-name"></h2>
         <div id="agent-meta"></div>
+        <h3>needs (sixfold)</h3>
+        <div id="agent-needs"></div>
         <h3>personality</h3>
         <div id="agent-personality"></div>
         <h3>genome</h3>

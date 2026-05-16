@@ -95,10 +95,21 @@ main {
   overflow: hidden;
 }
 
-canvas#village {
+#canvas-wrap {
   flex: 1;
-  cursor: crosshair;
+  overflow: hidden;
+  background: #0a0a0f;
+  position: relative;
 }
+
+canvas#village {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+canvas#village.dragging { cursor: grabbing; }
 
 aside#inspector {
   width: 260px;
@@ -158,6 +169,11 @@ aside#inspector {
   color: var(--text-dim);
 }
 
+.trait-bar.dominant .label {
+  color: var(--text);
+  font-weight: 600;
+}
+
 #agent-genome {
   font-size: 11px;
   color: var(--text-dim);
@@ -192,3 +208,4 @@ footer {
 .event.death .kind { color: #ff6b6b; }
 .event.immigration .kind { color: #6bc0ff; }
 .event.mutation .kind { color: #ffb86b; }
+.event.conflict .kind { color: #ff9b6b; }
