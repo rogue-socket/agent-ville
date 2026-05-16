@@ -7,9 +7,13 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from typing import Any
 
+from .persistence import DEFAULT_SNAPSHOT_PATH, LineageLog, load_snapshot
 from .village import Village
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+
+
+MOTION_TICK_INTERVAL = 0.033  # seconds — ~30 motion ticks/sec
 
 
 class SimulationState:
@@ -23,6 +27,10 @@ class SimulationState:
         with self._lock:
             self.village.step()
 
+    def motion_tick(self) -> None:
+        with self._lock:
+            self.village.motion_tick()
+
     def get_state(self) -> dict[str, Any]:
         with self._lock:
             return self.village.get_state()
@@ -33,12 +41,21 @@ class SimulationState:
 
 
 def simulation_loop(state: SimulationState) -> None:
-    """Background thread that advances the simulation."""
+    """Background thread.
+
+    Motion ticks run continuously (so agents drift even while paused).
+    Generation steps only run when `state.running`, gated by `state.speed`.
+    """
+    last_gen_time = time.monotonic()
     while True:
+        state.motion_tick()
         if state.running:
-            state.step()
-        interval = 1.0 / max(0.1, state.speed)
-        time.sleep(interval)
+            now = time.monotonic()
+            gen_interval = 1.0 / max(0.1, state.speed)
+            if now - last_gen_time >= gen_interval:
+                state.step()
+                last_gen_time = now
+        time.sleep(MOTION_TICK_INTERVAL)
 
 
 def make_handler(state: SimulationState):
@@ -97,7 +114,15 @@ def make_handler(state: SimulationState):
 
 
 def run(host: str = "localhost", port: int = 8420) -> None:
-    village = Village(population_size=15)
+    snapshot = load_snapshot(DEFAULT_SNAPSHOT_PATH)
+    if snapshot:
+        # Resume: reuse the prior lineage session_id so the TSV stays linkable.
+        log = LineageLog(session_id=snapshot.get("lineage_session_id"))
+        village = Village.from_snapshot(snapshot, lineage_log=log)
+        print(f"Resumed snapshot at generation {village.generation} (pop {sum(1 for a in village.agents if a.alive)})")
+    else:
+        village = Village(lineage_log=LineageLog())
+    village.snapshot_path = DEFAULT_SNAPSHOT_PATH
     state = SimulationState(village)
 
     # Start simulation in background thread
